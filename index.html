@@ -418,14 +418,14 @@
   <section class="section">
     <p class="section-label">Abstract</p>
     <p>
-Recent 3D Gaussian Splatting methods achieve real-time, high-quality novel view synthesis, but standard Gaussian primitives struggle to represent high-frequency details such as sharp edges, fine textures, and abrupt color changes in the scene. To address this, we propose 2D Gabor Mixture Splatting (2DGMSplat), a compact representation that embeds multiple Gabor kernels with different frequencies and colors into a single compact primitive, allowing richer spatial detail with fewer redundant primitives. Since optimizing Gabor frequencies and orientations is highly nonlinear, we introduce a dual-domain loss combining photometric supervision with wavelet-domain guidance. We further design a wavelet-error-driven densification strategy to selectively clone and prune primitives. Experiments on High-Frequency, Mip-NeRF360, T&T, and Deep Blending datasets show improved reconstruction of complex high-frequency textures.
+    Recent 3D Gaussian Splatting methods achieve real-time, high-quality novel view synthesis, but standard Gaussian primitives struggle to represent high-frequency details such as sharp edges, fine textures, and abrupt color changes in the scene. To address this, we propose 2D Gabor Mixture Splatting (2DGMSplat), a compact representation that embeds multiple Gabor kernels with different frequencies and colors into a single compact primitive, allowing richer spatial detail with fewer redundant primitives. Since optimizing Gabor frequencies and orientations is highly nonlinear, we introduce a dual-domain loss combining photometric supervision with wavelet-domain guidance. We further design a wavelet-error-driven densification strategy to selectively clone and prune primitives. Experiments on High-Frequency, Mip-NeRF360, T&T, and Deep Blending datasets show improved reconstruction of complex high-frequency textures.
     </p>
-    <p>
+    <!-- <p>
       However, [Your Method] suffers from a critical drawback: [describe the problem your paper addresses]. To overcome this limitation, we propose [your contribution], which [brief description of what it does].
     </p>
     <p>
       Our method achieves [key result]. We demonstrate its effectiveness through extensive experiments on [benchmarks], supported by comprehensive ablation studies.
-    </p>
+    </p> -->
   </section>
 
   <hr class="rule" />
@@ -446,11 +446,23 @@ Recent 3D Gaussian Splatting methods achieve real-time, high-quality novel view 
       </div>
     </div> -->
 
-    <p class="caption">Figure: Overview of the proposed pipeline. Replace this with a caption describing your method diagram.</p>
+    <p class="caption">Figure: Overview of the proposed pipeline.</p>
 
     <p style="margin-top:24px;">
-      <!-- Replace with your method description -->
-      [Describe your method here. Explain the key technical components, the inputs and outputs, and the intuition behind your design choices.]
+      <strong>Overview of the proposed Gabor mixture representation (2DGMSplat), dual-domain loss, and wavelet-based error densification strategy.</strong>
+      Each primitive is modeled as a mixture of <em>K</em> colored Gabor wavelets, all sharing the same Gaussian envelope, as illustrated with <em>K = 4</em>.
+      <strong>c<sub>i</sub></strong> represents the color parameters for the Gabor wavelet <em>ψ<sub>i</sub></em>.
+      The combination of these Gabor components forms <em>Ψ<sub>j</sub></em>, corresponding to one primitive in the 3D scene.
+    </p>
+    
+    <p>
+      For the dual-domain loss, both the ground-truth image <em>T</em> and the rendered image <em>R</em> are decomposed using a three-level stationary wavelet transform, <em>J = 3</em>, with the Haar/DB1 wavelet.
+      The loss terms are summed across the decomposition levels, as indicated by the green lines in the method overview.
+    </p>
+    
+    <p>
+      For wavelet error-guided densification, the same Haar/DB1 wavelet is used, but only the first-level high-frequency sub-bands, <em>HL</em>, <em>LH</em>, and <em>HH</em>, are considered, as highlighted by the orange lines.
+      These sub-bands are used to calculate the wavelet-domain error map <em>E<sub>SWT</sub></em>, which is then inversely projected onto the 3D scene to select primitives for adaptive density control.
     </p>
   </section>
 
