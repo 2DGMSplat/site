@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2DGMSplat — WACV 2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f5f0;
+      --surface: #ffffff;
+      --ink: #1a1714;
+      --ink-mid: #4a4540;
+      --ink-light: #8a837a;
+      --accent: #c8491a;
+      --accent-soft: #f0e8e2;
+      --border: #e2ddd8;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --serif: 'Playfair Display', Georgia, serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── TOP BAR ─── */
+    .topbar {
+      background: var(--ink);
+      color: #fffdf8;
+      padding: 10px 0;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      font-family: var(--sans);
+      font-weight: 500;
+    }
+    .topbar a { color: var(--accent); text-decoration: none; }
+    .topbar a:hover { text-decoration: underline; }
+
+    /* ─── HERO ─── */
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 72px 24px 48px;
+      text-align: center;
+    }
+
+    .conference-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 2px;
+      margin-bottom: 28px;
+      font-family: var(--sans);
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4vw, 2.9rem);
+      font-weight: 600;
+      line-height: 1.22;
+      color: var(--ink);
+      margin-bottom: 32px;
+      letter-spacing: -0.01em;
+      font-variant-numeric: lining-nums;
+      font-feature-settings: "lnum" 1;
+    }
+
+    .authors {
+      font-size: 15px;
+      color: var(--ink-mid);
+      margin-bottom: 8px;
+      line-height: 1.9;
+    }
+    .authors a {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .authors a:hover { color: var(--accent); border-color: var(--accent); }
+
+    .affiliation {
+      font-size: 13.5px;
+      color: var(--ink-light);
+      margin-bottom: 36px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ─── LINKS ROW ─── */
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 56px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 22px;
+      border-radius: 3px;
+      font-size: 13.5px;
+      font-weight: 500;
+      font-family: var(--sans);
+      text-decoration: none;
+      transition: all 0.18s ease;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: #fffdf8;
+      border: 1.5px solid var(--ink);
+    }
+    .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--ink); background: var(--surface); }
+
+    .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ─── DIVIDER ─── */
+    .rule {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 860px;
+      margin: 0 auto 56px;
+    }
+
+    /* ─── TEASER IMAGE ─── */
+    .teaser {
+      max-width: 920px;
+      margin: 0 auto 64px;
+      padding: 0 24px;
+    }
+    .img-placeholder {
+      width: 100%;
+      background: var(--surface);
+      border: 1.5px dashed var(--border);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--ink-light);
+      font-size: 13px;
+      font-family: var(--mono);
+      position: relative;
+      overflow: hidden;
+    }
+    .img-placeholder::before {
+      content: '';
+      display: block;
+      padding-top: 42%;
+    }
+    .img-placeholder-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .img-placeholder svg { width: 28px; height: 28px; opacity: 0.35; }
+    .img-placeholder span { opacity: 0.55; letter-spacing: 0.03em; }
+
+    /* real img tag for when you drop in images */
+    .teaser img, .section img { width: 100%; border-radius: 4px; display: block; }
+
+    .caption {
+      font-size: 13px;
+      color: var(--ink-light);
+      text-align: center;
+      margin-top: 14px;
+      font-style: italic;
+      font-family: var(--serif);
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ─── SECTIONS ─── */
+    .section {
+      max-width: 760px;
+      margin: 0 auto 64px;
+      padding: 0 24px;
+    }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-family: var(--sans);
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 22px;
+      color: var(--ink);
+    }
+
+    p {
+      font-size: 15.5px;
+      color: var(--ink-mid);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    /* ─── VIDEO ─── */
+    .video-wrapper {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--surface);
+      border: 1.5px dashed var(--border);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-light);
+      font-family: var(--mono);
+      font-size: 13px;
+      overflow: hidden;
+      position: relative;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 4px;
+    }
+    .video-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.5;
+    }
+    .video-hint svg { width: 32px; height: 32px; }
+
+    /* ─── IMAGE GRID (comparison / gallery) ─── */
+    .img-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .img-grid .img-placeholder { aspect-ratio: 4/3; }
+    .img-grid .img-placeholder::before { padding-top: 0; }
+    .img-grid img { width: 100%; border-radius: 4px; aspect-ratio: 4/3; object-fit: cover; }
+
+    @media (max-width: 560px) { .img-grid { grid-template-columns: 1fr; } }
+
+    /* ─── BIBTEX ─── */
+    .bibtex-box {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      padding: 24px 28px;
+      position: relative;
+    }
+    .bibtex-box pre {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: var(--ink-mid);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      font-family: var(--sans);
+      font-weight: 500;
+      color: var(--ink-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .copy-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .copy-btn.copied { background: #2a7a4a; color: #fff; border-color: #2a7a4a; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--ink-light);
+      line-height: 1.8;
+      margin-top: 40px;
+    }
+    footer a { color: var(--ink-mid); }
+    footer a:hover { color: var(--accent); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero > * { animation: fadeUp 0.55s ease both; }
+    .hero > *:nth-child(1) { animation-delay: 0.05s; }
+    .hero > *:nth-child(2) { animation-delay: 0.12s; }
+    .hero > *:nth-child(3) { animation-delay: 0.18s; }
+    .hero > *:nth-child(4) { animation-delay: 0.22s; }
+    .hero > *:nth-child(5) { animation-delay: 0.27s; }
+
+   /* ─── THREE-WAY COMPARISON SLIDER ─── */
+.compare-slider {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 8px;
+  user-select: none;
+  touch-action: none;
+  background: #111;
+}
+
+.compare-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.compare-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Initial layout:
+   Ground Truth: 0% → 33%
+   Neural Gabor: 33% → 66%
+   2DGMSplat: 66% → 100%
+*/
+.compare-gt {
+  clip-path: inset(0 66.666% 0 0);
+}
+
+.compare-neural {
+  clip-path: inset(0 33.333% 0 33.333%);
+}
+
+.compare-ours {
+  clip-path: inset(0 0 0 66.666%);
+}
+
+.compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #fff;
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px rgba(0,0,0,0.45);
+  z-index: 10;
+  cursor: ew-resize;
+}
+
+.compare-handle-left {
+  left: 33.333%;
+}
+
+.compare-handle-right {
+  left: 66.666%;
+}
+
+.compare-handle-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 38px;
+  height: 38px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  color: #333;
+}
+
+.compare-label {
+  position: absolute;
+  bottom: 12px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border-radius: 4px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.label-gt {
+  left: 12px;
+}
+
+.label-neural {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.label-ours {
+  right: 12px;
+}
+
+/* ─── SCENE / IMAGE PICKER ─── */
+.scene-picker {
+  max-width: 900px;
+  margin: 0 auto 16px;
+}
+
+.scene-picker label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scene-picker select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.scene-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+  scrollbar-width: thin;
+}
+
+.scene-thumb {
+  flex: 0 0 140px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.scene-thumb:hover {
+  transform: translateY(-2px);
+  border-color: var(--border);
+}
+
+.scene-thumb.active {
+  border-color: var(--accent);
+}
+
+.scene-thumb img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.scene-thumb span {
+  display: block;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--ink-mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+  </style>
+</head>
+<body>
+
+  <!-- ── TOP NAV ── -->
+  <div class="topbar">
+    More research &nbsp;·&nbsp;
+    <!-- Add links to other papers here -->
+    <a href="#">Other Project</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <!-- Replace with your conference + year -->
+    <span class="conference-badge">WACV · 2027</span>
+
+    <!-- Replace with your paper title -->
+    <h1>2DGMSplat: 2D Gabor Splatting with Colored Mixture of Kernels and Dual Domain Optimization</h1>
+
+
+    <!-- Replace author names and links -->
+    <div class="authors">
+      <a href="#">First Author</a>,&ensp;
+      <a href="#">Second Author</a>,&ensp;
+      <a href="#">Third Author</a>
+    </div>
+
+    <!-- Replace with your institution -->
+    <div class="affiliation">Your University / Institution Name</div>
+
+    <!-- ── LINK BUTTONS ── -->
+    <div class="links">
+      <!-- Replace href with your arXiv / paper URL -->
+      <a class="btn btn-primary" href="YOUR_PAPER_LINK_HERE" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Paper
+      </a>
+
+      <!-- Replace href with your GitHub code repo -->
+      <a class="btn btn-outline" href="YOUR_CODE_LINK_HERE" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.92.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        Code
+      </a>
+
+      <!-- Replace href with your rasterizer repo -->
+      <a class="btn btn-outline" href="YOUR_RASTERIZER_LINK_HERE" target="_blank">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Rasterizer
+      </a>
+    </div>
+  </header>
+
+  <hr class="rule" />
+
+  <!-- ── TEASER IMAGE ── -->
+  <!-- <div class="teaser">
+ 
+    <div class="img-placeholder">
+      <div class="img-placeholder-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span><br/>e.g. &lt;img src="assets/teaser.jpg" alt="..." /&gt;</span>
+      </div>
+    </div>
+
+    <p class="caption">Your method captures [key insight] with significantly fewer primitives — replace this caption with a description of your teaser figure.</p>
+  </div> -->
+<!--  -->
+<div class="teaser">
+
+  <div class="scene-picker">
+    <label for="sceneSelect">Choose comparison image</label>
+    <select id="sceneSelect"></select>
+
+    <div class="scene-strip" id="sceneStrip"></div>
+  </div>
+
+  <div class="compare-slider" id="teaserSlider">
+
+    <!-- LEFT: Ground Truth -->
+    <div class="compare-image compare-gt" id="teaserGT">
+      <img id="teaserGTImg" src="" alt="Ground Truth image">
+    </div>
+
+    <!-- MIDDLE: Neural Gabor -->
+    <div class="compare-image compare-neural" id="teaserNeural">
+      <img id="teaserNeuralImg" src="" alt="Neural Gabor result">
+    </div>
+
+    <!-- RIGHT: 2DGMSplat -->
+    <div class="compare-image compare-ours" id="teaserOurs">
+      <img id="teaserOursImg" src="" alt="2DGMSplat result">
+    </div>
+
+    <!-- Labels -->
+    <div class="compare-label label-gt">Ground Truth</div>
+    <div class="compare-label label-neural">Neural Gabor</div>
+    <div class="compare-label label-ours">2DGMSplat</div>
+
+    <!-- Left handle -->
+    <div class="compare-handle compare-handle-left" id="teaserHandleLeft">
+      <div class="compare-handle-circle">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 6l-6 6 6 6"/>
+          <path d="M9 6l6 6-6 6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Right handle -->
+    <div class="compare-handle compare-handle-right" id="teaserHandleRight">
+      <div class="compare-handle-circle">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 6l-6 6 6 6"/>
+          <path d="M9 6l6 6-6 6"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="caption" id="teaserCaption">
+    Drag the two sliders to compare Ground Truth, Neural Gabor, and 2DGMSplat.
+  </p>
+
+</div>
+</div>
+  <!-- ── ABSTRACT ── -->
+  <section class="section">
+    <p class="section-label">Abstract</p>
+    <p>
+    Recent 3D Gaussian Splatting methods achieve real-time, high-quality novel view synthesis, but standard Gaussian primitives struggle to represent high-frequency details such as sharp edges, fine textures, and abrupt color changes in the scene. To address this, we propose 2D Gabor Mixture Splatting (2DGMSplat), a compact representation that embeds multiple Gabor kernels with different frequencies and colors into a single compact primitive, allowing richer spatial detail with fewer redundant primitives. Since optimizing Gabor frequencies and orientations is highly nonlinear, we introduce a dual-domain loss combining photometric supervision with wavelet-domain guidance. We further design a wavelet-error-driven densification strategy to selectively clone and prune primitives. Experiments on High-Frequency, Mip-NeRF360, T&T, and Deep Blending datasets show improved reconstruction of complex high-frequency textures.
+    </p>
+    <!-- <p>
+      However, [Your Method] suffers from a critical drawback: [describe the problem your paper addresses]. To overcome this limitation, we propose [your contribution], which [brief description of what it does].
+    </p>
+    <p>
+      Our method achieves [key result]. We demonstrate its effectiveness through extensive experiments on [benchmarks], supported by comprehensive ablation studies.
+    </p> -->
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── METHOD ── -->
+  <section class="section">
+    <p class="section-label">Method</p>
+    <h2>How It Works</h2>
+    <img src="assets/pipeline.png" alt="Method overview" />
+    <!--
+      REPLACE THIS PLACEHOLDER with your method/pipeline figure:
+        <img src="assets/method.jpg" alt="Method overview" />
+    -->
+    <!-- <div class="img-placeholder" style="--h:46%">
+      <div class="img-placeholder-inner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span><img src="assets/pipeline.png" alt="Method overview" /></span>
+      </div>
+    </div> -->
+
+    <p class="caption">Figure: Overview of the proposed pipeline.</p>
+
+    <p style="margin-top:24px;">
+      <strong>Overview of the proposed Gabor mixture representation (2DGMSplat), dual-domain loss, and wavelet-based error densification strategy.</strong>
+      Each primitive is modeled as a mixture of <em>K</em> colored Gabor wavelets, all sharing the same Gaussian envelope, as illustrated with <em>K = 4</em>.
+      <strong>c<sub>i</sub></strong> represents the color parameters for the Gabor wavelet <em>ψ<sub>i</sub></em>.
+      The combination of these Gabor components forms <em>Ψ<sub>j</sub></em>, corresponding to one primitive in the 3D scene.
+    </p>
+    
+    <p>
+      For the dual-domain loss, both the ground-truth image <em>T</em> and the rendered image <em>R</em> are decomposed using a three-level stationary wavelet transform, <em>J = 3</em>, with the Haar/DB1 wavelet.
+      The loss terms are summed across the decomposition levels, as indicated by the green lines in the method overview.
+    </p>
+    
+    <p>
+      For wavelet error-guided densification, the same Haar/DB1 wavelet is used, but only the first-level high-frequency sub-bands, <em>HL</em>, <em>LH</em>, and <em>HH</em>, are considered, as highlighted by the orange lines.
+      These sub-bands are used to calculate the wavelet-domain error map <em>E<sub>SWT</sub></em>, which is then inversely projected onto the 3D scene to select primitives for adaptive density control.
+    </p>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── VIDEO ── -->
+  <section class="section">
+    <p class="section-label">Video</p>
+    <h2>Overview Video</h2>
+    <div class="video-wrapper">
+      <!--
+        REPLACE THIS PLACEHOLDER with your YouTube embed:
+          <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe>
+
+        Or remove the .video-hint div and uncomment the iframe above.
+      -->
+      <div class="video-hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" opacity="0.4"/></svg>
+        <span><!-- ADD YOUTUBE EMBED HERE --><br/>&lt;iframe src="https://www.youtube.com/embed/VIDEO_ID" /&gt;</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── VISUAL COMPARISONS ── -->
+  <section class="section">
+    <p class="section-label">Results</p>
+    <h2>Visual Comparisons</h2>
+    <p>Our method can express [key advantage] more accurately than [baseline] on the same data size.</p>
+
+    <!--
+      REPLACE these placeholders with your result images.
+      Example:
+        <div class="img-grid">
+          <img src="assets/compare_ours.jpg" alt="Ours" />
+          <img src="assets/compare_baseline.jpg" alt="Baseline" />
+          <img src="assets/compare_ours2.jpg" alt="Ours (scene 2)" />
+          <img src="assets/compare_baseline2.jpg" alt="Baseline (scene 2)" />
+        </div>
+    -->
+    <div class="img-grid">
+      <div class="img-placeholder" style="aspect-ratio:4/3;"><div class="img-placeholder-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;opacity:.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="opacity:.4;font-size:11px;">Ours</span></div></div>
+      <div class="img-placeholder" style="aspect-ratio:4/3;"><div class="img-placeholder-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;opacity:.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="opacity:.4;font-size:11px;">Baseline</span></div></div>
+      <div class="img-placeholder" style="aspect-ratio:4/3;"><div class="img-placeholder-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;opacity:.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="opacity:.4;font-size:11px;">Ours (scene 2)</span></div></div>
+      <div class="img-placeholder" style="aspect-ratio:4/3;"><div class="img-placeholder-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;opacity:.3"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span style="opacity:.4;font-size:11px;">Baseline (scene 2)</span></div></div>
+    </div>
+
+    <!-- Add more image rows as needed -->
+    <!-- Example single full-width image:
+    <img src="assets/ablation.jpg" alt="Ablation study" style="margin-top:16px;border-radius:4px;" />
+    -->
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── BIBTEX ── -->
+  <section class="section">
+    <p class="section-label">Citation</p>
+    <h2>BibTeX</h2>
+    <div class="bibtex-box">
+      <button class="copy-btn" id="copyBtn" onclick="copyBibtex()">Copy</button>
+      <pre id="bibtexContent">@inproceedings{yourkey,
+  title     = {Your Paper Title: A Descriptive Subtitle},
+  author    = {Last, First and Last, First and Last, First},
+  booktitle = {Proceedings of Conference Name},
+  year      = {Year}
+}</pre>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    This page was built using the
+    <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>,
+    adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.<br/>
+    Licensed under a
+    <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+  </footer>
+
+  <script>
+
+  function copyBibtex() {
+    const text = document.getElementById('bibtexContent').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  (function () {
+    /*
+      Add all your image folders here.
+
+      Each folder should contain:
+      - Ground_Truth.png
+      - neuralG.png
+      - 2dgmsplat.png
+    */
+    const scenes = [
+
+      {
+        name: 'garden',
+        folder: 'assets/comparisons/scene_07'
+      },    
+      {
+        name: 'Shirt',
+        folder: 'assets/comparisons/scene_01'
+      },      
+      {
+        name: 'Treehill',
+        folder: 'assets/comparisons/scene_03'
+      },
+
+      // {
+      //   name: 'flowers',
+      //   folder: 'assets/comparisons/scene_04'
+      // },       
+      {
+        name: 'bonsai',
+        folder: 'assets/comparisons/scene_05'
+      },
+      {
+        name: 'counter',
+        folder: 'assets/comparisons/scene_06'
+      },
+
+   
+      {
+        name: 'Playroom',
+        folder: 'assets/comparisons/scene_02'
+      },
+
+
+    ];
+
+    const slider = document.getElementById('teaserSlider');
+
+    const gt = document.getElementById('teaserGT');
+    const neural = document.getElementById('teaserNeural');
+    const ours = document.getElementById('teaserOurs');
+
+    const gtImg = document.getElementById('teaserGTImg');
+    const neuralImg = document.getElementById('teaserNeuralImg');
+    const oursImg = document.getElementById('teaserOursImg');
+
+    const leftHandle = document.getElementById('teaserHandleLeft');
+    const rightHandle = document.getElementById('teaserHandleRight');
+
+    const sceneSelect = document.getElementById('sceneSelect');
+    const sceneStrip = document.getElementById('sceneStrip');
+    const teaserCaption = document.getElementById('teaserCaption');
+
+    let leftPct = 33.333;
+    let rightPct = 66.666;
+    const minGap = 3;
+    let activeHandle = null;
+    let activeSceneIndex = 0;
+
+    function getScenePaths(scene) {
+      return {
+        gt: `${scene.folder}/Ground_Truth.png`,
+        neural: `${scene.folder}/neuralG.png`,
+        ours: `${scene.folder}/2dgmsplat.png`
+      };
+    }
+
+    function applyClips() {
+      gt.style.clipPath = `inset(0 ${100 - leftPct}% 0 0)`;
+      neural.style.clipPath = `inset(0 ${100 - rightPct}% 0 ${leftPct}%)`;
+      ours.style.clipPath = `inset(0 0 0 ${rightPct}%)`;
+
+      leftHandle.style.left = leftPct + '%';
+      rightHandle.style.left = rightPct + '%';
+    }
+
+    function resetSliderPositions() {
+      leftPct = 33.333;
+      rightPct = 66.666;
+      applyClips();
+    }
+
+    function setActiveScene(index) {
+      activeSceneIndex = index;
+
+      const scene = scenes[index];
+      const paths = getScenePaths(scene);
+
+      gtImg.src = paths.gt;
+      neuralImg.src = paths.neural;
+      oursImg.src = paths.ours;
+
+      gtImg.alt = `${scene.name} Ground Truth`;
+      neuralImg.alt = `${scene.name} Neural Gabor`;
+      oursImg.alt = `${scene.name} 2DGMSplat`;
+
+      sceneSelect.value = String(index);
+
+      document.querySelectorAll('.scene-thumb').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+
+      teaserCaption.textContent =
+        `${scene.name}: drag the two sliders to compare Ground Truth, Neural Gabor, and 2DGMSplat.`;
+
+      resetSliderPositions();
+    }
+
+    function buildScenePicker() {
+      scenes.forEach((scene, index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = scene.name;
+        sceneSelect.appendChild(option);
+
+        const paths = getScenePaths(scene);
+
+        const button = document.createElement('button');
+        button.className = 'scene-thumb';
+        button.type = 'button';
+        button.setAttribute('aria-label', `Show ${scene.name}`);
+
+        button.innerHTML = `
+          <img src="${paths.gt}" alt="${scene.name} thumbnail">
+          <span>${scene.name}</span>
+        `;
+
+        button.addEventListener('click', () => {
+          setActiveScene(index);
+          button.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+          });
+        });
+
+        sceneStrip.appendChild(button);
+      });
+
+      sceneSelect.addEventListener('change', function () {
+        const index = Number(this.value);
+        setActiveScene(index);
+
+        const activeThumb = document.querySelectorAll('.scene-thumb')[index];
+        if (activeThumb) {
+          activeThumb.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'center',
+            block: 'nearest'
+          });
+        }
+      });
+    }
+
+    function getPctFromEvent(e) {
+      const rect = slider.getBoundingClientRect();
+      let pct = ((e.clientX - rect.left) / rect.width) * 100;
+      return Math.max(0, Math.min(100, pct));
+    }
+
+    function moveHandle(pct) {
+      if (activeHandle === 'left') {
+        leftPct = Math.max(0, Math.min(pct, rightPct - minGap));
+      }
+
+      if (activeHandle === 'right') {
+        rightPct = Math.min(100, Math.max(pct, leftPct + minGap));
+      }
+
+      applyClips();
+    }
+
+    function startDrag(handleName, e) {
+      activeHandle = handleName;
+      slider.setPointerCapture(e.pointerId);
+      moveHandle(getPctFromEvent(e));
+    }
+
+    leftHandle.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      startDrag('left', e);
+    });
+
+    rightHandle.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      startDrag('right', e);
+    });
+
+    slider.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('.compare-handle')) return;
+
+      const pct = getPctFromEvent(e);
+      const distToLeft = Math.abs(pct - leftPct);
+      const distToRight = Math.abs(pct - rightPct);
+
+      activeHandle = distToLeft <= distToRight ? 'left' : 'right';
+      slider.setPointerCapture(e.pointerId);
+      moveHandle(pct);
+    });
+
+    slider.addEventListener('pointermove', function (e) {
+      if (!activeHandle) return;
+      e.preventDefault();
+      moveHandle(getPctFromEvent(e));
+    });
+
+    slider.addEventListener('pointerup', function () {
+      activeHandle = null;
+    });
+
+    slider.addEventListener('pointercancel', function () {
+      activeHandle = null;
+    });
+
+    buildScenePicker();
+    setActiveScene(0);
+  })();
+
+  </script>
+</body>
+</html>
